@@ -19,10 +19,18 @@ namespace API.FornitureStore.Data
 
         public DbSet<ProductCategory> ProductCategories { get; set; }
 
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite();
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<OrderDetail>().HasKey(od => new { od.OrderId , od.ProductId });
+        }
     }
 }
