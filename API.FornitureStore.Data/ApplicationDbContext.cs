@@ -1,10 +1,11 @@
 ﻿using API.FurnitoreStore.Share;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
 namespace API.FornitureStore.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions options) : base(options) 
         { 

@@ -1,5 +1,9 @@
 using API.FornitureStore.Data;
+using API.FurnitoreStore.API.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,31 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
 options.UseSqlite(builder.Configuration.GetConnectionString("APIFurnitoreStoreContext")));
+builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(jwt =>
+{
+    var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWTConfig:Secret").Value);
+    jwt.SaveToken = true;
+    jwt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, //False mientras estemos en DESARROLLO, sino TRUE
+        ValidateAudience = false, //False mientras estemos en DESARROLLO, sino TRUE
+        RequireExpirationTime = false,
+        ValidateLifetime = true
+    };
+}
+);
+
+
 
 var app = builder.Build();
 
@@ -22,7 +51,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
