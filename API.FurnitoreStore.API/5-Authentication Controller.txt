@@ -1,0 +1,15 @@
+Authentication Controller (Video 34)
+
+Lo agregamos en el proyecto .API, la carpeta Controller: AuthenticationController.cs
+Es todo igual. 
+Inyectamos algunas dependencias:
+- private readonly UserManager<TUser> (pertenece a la librería AspNetCore.IDENTITY) --> Lo que espera (TUser) es una clase Usuario. IdentityUser es la clase por defecto. Según necesidades podemos crear una clase Usuario y hacerla heredar de IdentityUser.
+
+--> quedando asi:  private readonly UserManager<IdentityUser> _userManager;
+
+- private readonly JwtConfig _jwtConfig; (lo vamos a inyectar con un patron IOptions) --> Pertenece a la librería Extensions.Options -> Es un patron bastante estándar que nos sirve para traer elementos desde el archivo de configuración 
+(Program.cs -> builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"); )
+
+de la forma en la cual lo hemos hecho. 
+****Es decir, en la CLASE JwtConfig tengo mapeado las propiedades del appSettings.json/secrets.json y las inyecto en el controller mediante IOptions.****
+

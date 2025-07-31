@@ -1,0 +1,27 @@
+AUTENTICACION (VIDEO 31):
+Program.cs
+
+builder.Services.AddAuthentication() --> Nos permite registrar los servicios que se requieren para autenticar todos nuestros servicios. Vamos a personalizarlo mediante "options"
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; ---> Cual va a ser el esquema estandar por defecto
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; ---> No explica mucho
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; ---> No explica mucho
+}).
+
+.AddJwtBearer(jwt =>
+{
+    var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWTConfig:Secret").Value); --> Al secret lo encodea con ASCII, es bastante estándar. Esta KEY la va a usar para firmar el Token.
+    jwt.SaveToken = true;      										--> Le decimos al Identity Framework que almacene este token una vez que la autenticación es exitosa.
+    jwt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()  --> Esto es según la necesidades de la API.
+    {
+        ValidateIssuerSigningKey = true,								-> La Key que viene en la firma del Token tiene que ser Validada.
+        IssuerSigningKey = new SymmetricSecurityKey(key),						-> Esta es la Validación: La KEY que recibimos tiene que ser igual a la que key que creamos en el ISSUER (el que genera el Token)
+        ValidateIssuer = false, //False mientras estemos en DESARROLLO, sino TRUE 			-> Valida quien emitio el token
+        ValidateAudience = false, //False mientras estemos en DESARROLLO, sino TRUE			-> Valida quien era el destinatario de este token. 
+        RequireExpirationTime = false,	//False por ahora, hasta que se implemente el REFRESH TOKEN.	-> Solicita el tiempo de validez del token
+        ValidateLifetime = true										-> Valida el tiempo del vida del Token.
+    };
+}
+);

@@ -1,0 +1,28 @@
+Configuración de JWT: (VIDEO 30)
+
+1) En appSettings.json (donde suele ir la connection string) se agrega otro objeto JSON. Aquí es solo esqueleto/estructura para luego poder mappearlo a una clase/modelo e inyectarlo en el contenedor de dependencias (Program.cs)
+
+"JWTConfig":{
+	"Secret":""
+}
+
+2) Boton derecho sobre el proyecto: "Manage User Secrets"--> Esto genera en la carpeta del usuario --> una carpeta con un GUID con un archivo secret.json dentro.
+Esto lo que hace es, en la configuración del proyecto (Project file), se agrega una etiqueta XML con el GUID de la carpeta generada. 
+
+3) En el archivo "secrets.json" se debemos escribir el objeto con el secret propiamente dicho. En este archivo se escribe en un formato mas plano, no como objeto anidado.
+{
+"JWTConfig:Secret":"PsOjKuMfSjXE52drO" (string generado aleatoriamente)
+}
+
+4) En el proyecto, creamos una carpeta nueva "Configuration" -> dentro creamos una clase "JWTConfig" con las propiedades que necesitamos mappear, en este caso solo "secret".
+public class JWTConfig
+{
+    public string Secret { get; set; }
+}
+
+5) Ahora tenemos que inyectarlo en el contenedor de dependencias (Program.cs) :
+
+builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+
+Con esto lo que hacemos es leer el appSettings.json-> objeto "JWTConfig" -> Va a la prop Secret -> lee los objetos "JwtConfig:Secret" y lo mappea a la clase JWTConfig.Secret
+ 

@@ -1,0 +1,32 @@
+API MASTERY ROADMAP: 
+
+-------------LOGIN-------------
+
+Input: Email y Password
+Validar input:
+-No es valido --> Bad Request
+-Es valido --> Validar si usuario existe
+
+Usuario existe?
+-No existe: Invalid Payload
+-Existe: Validar email y password
+
+Email y Pass Validos?
+-No son validos: Invalid Credentials.
+-Son validos: Crear Access Token --> Acceso concedido
+
+
+-------------REGISTRATION-------------
+
+Input: Email y Password
+Validar input:
+-No es valido --> Bad Request
+-Es valido --> Validar si Email existe
+
+Validar si el Email existe:
+-Si ya existe: Bad Request-> Email already exists
+-No existe: Crear usuario, guardar nombre, email y password
+
+Validar Password (nros, mayusc, cant. caracteres):
+-No es valida: Bad Request->Invalid Password
+-Es valida: Crear Access Token-->Acceso concedido

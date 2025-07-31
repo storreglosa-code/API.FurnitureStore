@@ -1,0 +1,15 @@
+IDENTITY en Entity Framework (VIDEO 32)
+
+Hasta aca agregamos el servicio de autenticacion, y el servicio que inyecta el JWT con todos sus parametros.
+Ahora trabajamos con EF. Antes era un proceso muy manual, tabla de usuarios, roles, etc. 
+
+1) AppDbContext.cs
+
+Antes el Contexto heredaba de DbContext. Ahora va a heredar de IdentityDbContext, es como heredar de DbContext pero con un monton de clases tipicas de Identity con las que no contábamos antes (como Usuarios, Roles, etc).
+Este pequeño cambio nos va a permitir agregar varias cosas.
+
+a) Se crea una nueva migration por la modificación del dbContext. 
+b) Esta migration lo que hace es generar varias tablas con el prefijo "AspNet": Roles, Usuarios, Claims, UserClaims, UserLogins, UserRoles, UserTokens.
+c) Update-Database para aplicar los cambios en la BD.
+
+Ya tenemos una estructura que puede soportar usuarios--> El paso siguiente es agregar un controlador de autenticación, y para ello debemos crear dos clases mas.
