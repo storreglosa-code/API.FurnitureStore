@@ -1,4 +1,24 @@
+
+
 API MASTERY ROADMAP: 
+
+
+-------------REGISTRATION-------------
+
+Input: Email y Password
+Validar input:
+-No es valido --> Bad Request
+-Es valido --> Validar si Email existe
+
+Validar Email:
+-Si ya existe: Bad Request-> Email already exists
+-No existe: Crear usuario, guardar nombre, email y password
+
+Validar Password (nros, mayusc, cant. caracteres):
+-No es valida: Bad Request->Invalid Password
+-Es valida: Crear Access Token-->Acceso concedido (!!!) 
+Despues de tener JWT cambia! -> Si es valido se envia un email de confirmacion.
+
 
 -------------LOGIN-------------
 
@@ -11,22 +31,21 @@ Usuario existe?
 -No existe: Invalid Payload
 -Existe: Validar email y password
 
+Mail Confirmado?
+-No: necesita ser confirmado
+-Si: Validar Email y password.
+
 Email y Pass Validos?
 -No son validos: Invalid Credentials.
 -Son validos: Crear Access Token --> Acceso concedido
 
 
--------------REGISTRATION-------------
+09/Agosto/2025
+Quedan todos los controladores autorizados con token. 
+Proximo video: 
+- Swagger actualmente no permite ingresar Token para poder utilizar los metodos.
+- Agregar codigo para que Swagger pueda utilizar Token.
 
-Input: Email y Password
-Validar input:
--No es valido --> Bad Request
--Es valido --> Validar si Email existe
-
-Validar si el Email existe:
--Si ya existe: Bad Request-> Email already exists
--No existe: Crear usuario, guardar nombre, email y password
-
-Validar Password (nros, mayusc, cant. caracteres):
--No es valida: Bad Request->Invalid Password
--Es valida: Crear Access Token-->Acceso concedido
+12/Agosto/2025
+Se agregar codigo para que Swagger pueda utilizar Token.
+GOOGLEAR "OPEN API" -> Buenas practicas y recomendaciones
