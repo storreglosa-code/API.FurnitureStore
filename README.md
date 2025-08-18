@@ -1,5 +1,5 @@
 # 🛠️ API Furnitore Store
-Este proyecto replica un sistema de ventas a través de una API REST desarrollada en C# / .NET 6.
+Este proyecto replica un sistema de ventas a través de una API REST desarrollada en C# / .NET 8.
 Su objetivo es mostrar la implementación de autenticación, seguridad, persistencia de datos y arquitectura limpia, aplicando buenas prácticas de desarrollo backend.
 
 ## 🚀 Características principales:
