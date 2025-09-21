@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Bcpg;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using static System.Net.WebRequestMethods;
 
 namespace API.FurnitoreStore.API.Controllers
 {
@@ -65,15 +67,15 @@ namespace API.FurnitoreStore.API.Controllers
 
             if (isCreated.Succeeded)
             {
-                //var token = GenerateToken(user);
                 await SendVerificationEmail(user);
-                
-
 
                 return Ok(new AuthResult()
                 {
                     Result = true,
-                    //Token = token
+                    Errors = new List<string>() 
+                    {
+                        "To continue your email must be confirmed"
+                    }
                 });
             }
             else
@@ -89,11 +91,6 @@ namespace API.FurnitoreStore.API.Controllers
                 });
             }
 
-            //return BadRequest(new AuthResult 
-            //{
-            //    Result = false,
-            //    Errors = new List<string> { "User couldn't be created" }
-            //});
         }
 
         [HttpPost("Login")]
@@ -112,6 +109,14 @@ namespace API.FurnitoreStore.API.Controllers
                     Result = false
                 });
 
+            if (!existingUser.EmailConfirmed)
+                return BadRequest(new AuthResult
+                {
+                    Errors = new List<string> { "Email must be verified" },
+                    Result = false
+                });
+
+
             var checkUserAndPass = await _userManager.CheckPasswordAsync(existingUser, request.Password);
 
             if (!checkUserAndPass) return BadRequest(new AuthResult 
@@ -122,9 +127,36 @@ namespace API.FurnitoreStore.API.Controllers
 
             var token = GenerateToken(existingUser);
 
-
-
             return Ok(new AuthResult { Result = true, Token = token }); 
+        }
+
+        [HttpGet("ConfirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
+            {
+                return BadRequest(new AuthResult
+                {
+                    Result = false,
+                    Errors = new List<string> { "Invalid email confirmation URL." }
+                });
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+            {
+                return NotFound($"Unable to load user with id {userId}");
+            }
+
+            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+
+            var status = result.Succeeded ? "Thank you for confirming your email" : 
+                                            "There has been an error confirming your email";
+
+            return Ok(status);
         }
 
         private string GenerateToken(IdentityUser user)
@@ -142,7 +174,7 @@ namespace API.FurnitoreStore.API.Controllers
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), //Hace referencia a JWT Id. Es el ID del Token en sí.
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iat, DateTime.Now.ToUniversalTime().ToString())
                 })),
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTime),
                 SigningCredentials = new SigningCredentials (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
@@ -157,14 +189,19 @@ namespace API.FurnitoreStore.API.Controllers
             verificationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(verificationCode));
 
             //example: https://localhost:8080/api/authentication/verifyemail/userId=exampleuserId&code=examplecode
-            var callbackUrl = $"{Request.Scheme}://{Request.Host}{Url.Action("ConfirmEmail",controller:"Authentication", 
-                                                                new {userId = user.Id, code=verificationCode})}";
+            var callbackUrl = $@"{Request.Scheme}://{Request.Host}{Url.Action("ConfirmEmail", controller: "Authentication",
+                new { userId = user.Id, code = verificationCode })}";
 
-            var emailBody = $@"<h3> Verify email account </h3>
-                                <p> Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'> clicking here </a> </p>";
+
+            var emailBody = $@"<h3> Verify email account </h3> <br> 
+                            <p> Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'> <b>clicking here </b></a> </p>";
 
            await _emailSender.SendEmailAsync(user.Email, "Verify account", emailBody);
 
+            Console.WriteLine(callbackUrl);
+
         }
+
+        
     }
 }

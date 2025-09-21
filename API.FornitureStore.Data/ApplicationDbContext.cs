@@ -21,6 +21,7 @@ namespace API.FornitureStore.Data
         public DbSet<ProductCategory> ProductCategories { get; set; }
 
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

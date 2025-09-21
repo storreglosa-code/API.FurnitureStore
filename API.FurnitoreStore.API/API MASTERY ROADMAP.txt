@@ -16,8 +16,7 @@ Validar Email:
 
 Validar Password (nros, mayusc, cant. caracteres):
 -No es valida: Bad Request->Invalid Password
--Es valida: Crear Access Token-->Acceso concedido (!!!) 
-Despues de tener JWT cambia! -> Si es valido se envia un email de confirmacion.
+-Es valida: Crear Access Token (pero no se lo otorga al usuario hasta que no confirme email)-->se envia un email de confirmacion.
 
 
 -------------LOGIN-------------
@@ -49,3 +48,10 @@ Proximo video:
 12/Agosto/2025
 Se agregar codigo para que Swagger pueda utilizar Token.
 GOOGLEAR "OPEN API" -> Buenas practicas y recomendaciones
+
+25/Agosto/2025
+Se envia mail de confirmacion pero no funciona el LINK de Redirect URL.
+
+21/Septiembre/2025
+Solucionado el Link Redirect URL, el metodo estaba como PRIVATE en el Controller. 
+Eso hace que el endpoint no se exponga, NUNCA IBA A FUNCIONAR ASI.
