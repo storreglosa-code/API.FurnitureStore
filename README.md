@@ -5,10 +5,9 @@ Su objetivo es mostrar la implementación de autenticación, seguridad, persiste
 ## 🚀 Características principales:
 - Autenticación y autorización con JWT y soporte de Refresh Tokens.
 - Sistema de Login y Registro de usuarios con validación vía email.
-- Arquitectura MVC con separación de capas y uso de Entity Framework como ORM.
+- Arquitectura con separación de capas y uso de Entity Framework como ORM.
 - Gestión de cambios en la base de datos mediante migraciones.
 - Base de datos SQLite para portabilidad.
-- Logging y trazabilidad de operaciones.
 - Documentación y pruebas de endpoints con Swagger e Insomnia.
 
 ## ⚙️ Tecnologías utilizadas
@@ -17,4 +16,3 @@ Su objetivo es mostrar la implementación de autenticación, seguridad, persiste
 - SQLite
 - JWT & Refresh Tokens
 - Swagger / Insomnia
-- Arquitectura MVC 
