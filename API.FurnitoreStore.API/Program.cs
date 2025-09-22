@@ -9,7 +9,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using NLog;
+using NLog.Web;
 
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("Init main");
+
+try
+{
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -89,6 +96,9 @@ options.SignIn.RequireConfirmedAccount = false)  //Darle comportamiento por defe
     .AddEntityFrameworkStores<ApplicationDbContext>(); //El identity por default tiene que usar EF y ese DbContext para poder encontrar la tabla Usuarios.
 
 
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -105,3 +115,15 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+}
+catch (Exception e)
+{
+    logger.Error(e, "There has been an error");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}
+
