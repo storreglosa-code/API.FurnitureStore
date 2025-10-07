@@ -71,8 +71,8 @@ var tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(key),
-    ValidateIssuer = false, //False mientras estemos en DESARROLLO, sino TRUE
-    ValidateAudience = false, //False mientras estemos en DESARROLLO, sino TRUE
+    ValidateIssuer = true, //False mientras estemos en DESARROLLO, sino TRUE
+    ValidateAudience = true, //False mientras estemos en DESARROLLO, sino TRUE
     RequireExpirationTime = false,
     ValidateLifetime = true
 };
@@ -92,7 +92,7 @@ builder.Services.AddAuthentication(options =>
 }
 );
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-options.SignIn.RequireConfirmedAccount = false)  //Darle comportamiento por defecto, False mientras estemos en DESARROLLO, sino TRUE
+options.SignIn.RequireConfirmedAccount = true)  //Darle comportamiento por defecto, False mientras estemos en DESARROLLO, sino TRUE
     .AddEntityFrameworkStores<ApplicationDbContext>(); //El identity por default tiene que usar EF y ese DbContext para poder encontrar la tabla Usuarios.
 
 
@@ -102,11 +102,9 @@ options.SignIn.RequireConfirmedAccount = false)  //Darle comportamiento por defe
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-} 
+app.UseSwagger();
+app.UseSwaggerUI();
+ 
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
