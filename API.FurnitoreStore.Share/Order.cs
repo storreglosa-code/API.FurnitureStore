@@ -16,7 +16,9 @@ namespace API.FurnitoreStore.Share
 
         public DateTime OrderDate { get; set; }
 
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+
+        public string? Observaciones { get; set; }
 
         public List<OrderDetail> OrderDetails { get; set; }
     }

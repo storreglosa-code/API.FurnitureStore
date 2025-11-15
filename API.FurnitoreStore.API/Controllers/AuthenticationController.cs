@@ -60,7 +60,7 @@ namespace API.FurnitoreStore.API.Controllers
             var emailExists = await _userManager.FindByEmailAsync(request.EmailAddress);
 
             if (emailExists != null)
-                return BadRequest(new AuthResult()
+                return BadRequest(new LoginResponse()
                 {
                     Result = false,
                     Errors = new List<string>()
@@ -84,7 +84,7 @@ namespace API.FurnitoreStore.API.Controllers
                 await SendVerificationEmail(user);
 
                 _logger.LogWarning("Usuario creado",user);
-                return Ok(new AuthResult()
+                return Ok(new LoginResponse()
                 {
                     Result = true,
                     Errors = new List<string>() 
@@ -99,7 +99,7 @@ namespace API.FurnitoreStore.API.Controllers
                 foreach (var err in isCreated.Errors)
                     errors.Add(err.Description);
 
-                return BadRequest(new AuthResult
+                return BadRequest(new LoginResponse
                 { 
                     Result = false,
                     Errors = errors
@@ -118,14 +118,14 @@ namespace API.FurnitoreStore.API.Controllers
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
 
             if (existingUser == null)
-                return BadRequest(new AuthResult
+                return BadRequest(new LoginResponse
                 {
                     Errors = new List<string> {"Invalid Payload"},
                     Result = false
                 });
 
             if (!existingUser.EmailConfirmed)
-                return BadRequest(new AuthResult
+                return BadRequest(new LoginResponse
                 {
                     Errors = new List<string> { "Email must be verified" },
                     Result = false
@@ -134,15 +134,15 @@ namespace API.FurnitoreStore.API.Controllers
 
             var checkUserAndPass = await _userManager.CheckPasswordAsync(existingUser, request.Password);
 
-            if (!checkUserAndPass) return BadRequest(new AuthResult 
+            if (!checkUserAndPass) return BadRequest(new LoginResponse 
             { 
                 Errors = new List<string> {"Invalid credentials"},
                 Result = false
             });
 
-            var token = GenerateTokenAsync(existingUser);
+            var authenticatedUser = GenerateTokenAsync(existingUser);
 
-            return Ok(token); 
+            return Ok(authenticatedUser); 
         }
 
         [HttpGet("ConfirmEmail")]
@@ -150,7 +150,7 @@ namespace API.FurnitoreStore.API.Controllers
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(code))
             {
-                return BadRequest(new AuthResult
+                return BadRequest(new LoginResponse
                 {
                     Result = false,
                     Errors = new List<string> { "Invalid email confirmation URL." }
@@ -174,7 +174,7 @@ namespace API.FurnitoreStore.API.Controllers
             return Ok(status);
         }
 
-        private async Task<AuthResult> GenerateTokenAsync(IdentityUser user)
+        private async Task<LoginResponse> GenerateTokenAsync(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler(); //Es la clase que va a crear el token propiamente dicho
             var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
@@ -214,11 +214,13 @@ namespace API.FurnitoreStore.API.Controllers
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
 
-            return new AuthResult
+            return new LoginResponse
             {
                 Token= jwtToken,
                 RefreshToken=refreshToken.Token,
-                Result=true
+                Result=true,
+                ClientId=int.Parse(user.Id),
+                UserName=user.UserName
             };
         }
 
@@ -226,7 +228,7 @@ namespace API.FurnitoreStore.API.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] TokenRequestDto tokenRequestDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new AuthResult
+                return BadRequest(new LoginResponse
                 {
                     Errors = new List<string> { "Invalid parameters" },
                     Result = false
@@ -234,7 +236,7 @@ namespace API.FurnitoreStore.API.Controllers
             var results = VerifyAndGenerateTokenAsync(tokenRequestDto);
 
             if (results == null)
-            { return BadRequest(new AuthResult {
+            { return BadRequest(new LoginResponse {
             
                 Errors = new List<string> { "Invalid token"}
             });
@@ -261,7 +263,7 @@ namespace API.FurnitoreStore.API.Controllers
 
         }
 
-        private async Task<AuthResult> VerifyAndGenerateTokenAsync(TokenRequestDto tokenRequestDto)
+        private async Task<LoginResponse> VerifyAndGenerateTokenAsync(TokenRequestDto tokenRequestDto)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -313,7 +315,7 @@ namespace API.FurnitoreStore.API.Controllers
             catch (Exception e)
             {
                 var message = e.Message == "Invalid Token" || e.Message == "Expired Token" ? e.Message : "Internal Server Error";
-                return new AuthResult() { Result = false, Errors = new List<string> { message } };
+                return new LoginResponse() { Result = false, Errors = new List<string> { message } };
             }
         }
     }
