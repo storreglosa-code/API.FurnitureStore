@@ -17,5 +17,6 @@ namespace API.FurnitoreStore.Share
         public int ProductCategoryId { get; set; }
 
         public List<OrderDetail> OrderDetails { get; set; }
+        public List<ProductImage> Images { get; set; }
     }
 }

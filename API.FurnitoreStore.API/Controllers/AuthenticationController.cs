@@ -143,6 +143,7 @@ namespace API.FurnitoreStore.API.Controllers
             var authenticatedUser = GenerateTokenAsync(existingUser);
 
             return Ok(authenticatedUser); 
+        
         }
 
         [HttpGet("ConfirmEmail")]
@@ -214,12 +215,20 @@ namespace API.FurnitoreStore.API.Controllers
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
 
+            var aspNetUserGuid = Guid.Parse(user.Id);
+
+            var clientId = _context.Clients
+                .Where(c => c.AspNetUserId == aspNetUserGuid)
+                .Select(c => c.Id)
+                .FirstOrDefault();
+
+
             return new LoginResponse
             {
                 Token= jwtToken,
                 RefreshToken=refreshToken.Token,
                 Result=true,
-                ClientId=int.Parse(user.Id),
+                ClientId=clientId,
                 UserName=user.UserName
             };
         }
