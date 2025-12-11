@@ -21,7 +21,8 @@ namespace API.FornitureStore.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite();
+            optionsBuilder.UseNpgsql();
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
