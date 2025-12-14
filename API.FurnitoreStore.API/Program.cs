@@ -73,10 +73,14 @@ try
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     builder.Services.AddSingleton<IEmailSender, EmailService>();
 
+
     // Llave JWT
     var key = Encoding.ASCII.GetBytes(
         builder.Configuration["JWTConfig:Secret"]
     );
+
+    var debugSecret = builder.Configuration["JWTConfig:Secret"];
+    Console.WriteLine($"JWT SECRET LENGTH: {debugSecret?.Length ?? 0}");
 
     var tokenValidationParameters = new TokenValidationParameters()
     {
