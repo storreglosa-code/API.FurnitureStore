@@ -1,4 +1,4 @@
-﻿using API.FornitureStore.Data;
+using API.FornitureStore.Data;
 using API.FurnitoreStore.API.Configuration;
 using API.FurnitoreStore.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,6 +57,7 @@ try
             }
         });
     });
+    
 
     // ⚠ Cargar cadena de conexión: appsettings.json o variable Railway
     var connectionString =
@@ -67,20 +68,29 @@ try
         options.UseNpgsql(connectionString));
 
     // JWT
-    builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+    var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
 
     // Email
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     builder.Services.AddSingleton<IEmailSender, EmailService>();
 
 
-    // Llave JWT
-    var key = Encoding.ASCII.GetBytes(
-        builder.Configuration["JWTConfig:Secret"]
-    );
+ 
 
-    var debugSecret = builder.Configuration["JWTConfig:Secret"];
+    var debugSecret = jwtConfigSection["Secret"];
+
+    if (string.IsNullOrEmpty(debugSecret))
+    {
+        debugSecret = builder.Configuration["JWTConfig:Secret"];
+    }
+
     Console.WriteLine($"JWT SECRET LENGTH: {debugSecret?.Length ?? 0}");
+    Console.WriteLine("=== ENV VAR CHECK ===");
+    Console.WriteLine("JWTConfig__Secret raw: " + Environment.GetEnvironmentVariable("JWTConfig__Secret"));
+    Console.WriteLine("JWTConfig:Secret via config: " + builder.Configuration["JWTConfig:Secret"]);
+
+    // Llave JWT
+    var key = Encoding.ASCII.GetBytes(debugSecret);
 
     var tokenValidationParameters = new TokenValidationParameters()
     {
