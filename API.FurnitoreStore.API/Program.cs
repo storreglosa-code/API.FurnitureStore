@@ -60,6 +60,7 @@ try
     
 
    var connectionString = builder.Configuration["DefaultConnection"];
+   Console.WriteLine($"Connection String: {connectionString}");
 
    if (string.IsNullOrWhiteSpace(connectionString))
    {
