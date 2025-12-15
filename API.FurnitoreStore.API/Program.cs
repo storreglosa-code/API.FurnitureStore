@@ -59,10 +59,13 @@ try
     });
     
 
-    // ⚠ Cargar cadena de conexión: appsettings.json o variable Railway
-    var connectionString =
-        builder.Configuration.GetConnectionString("DefaultConnection") ??
-        builder.Configuration["DefaultConnection"]; // <-- para Railway
+    // Cargar cadena de conexión: appsettings.json o variable Railway
+    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        Console.Error.WriteLine("FATAL ERROR: Connection String (DATABASE_URL) no encontrada.");
+        throw new InvalidOperationException("La cadena de conexión a la base de datos es nula o vacía.");
+    }
 
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(connectionString));
