@@ -59,18 +59,14 @@ try
     });
     
 
-    // Cargar cadena de conexión: appsettings.json o variable Railway
-    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        Console.Error.WriteLine("FATAL ERROR: Connection String (DATABASE_URL) no encontrada.");
-        throw new InvalidOperationException("La cadena de conexión a la base de datos es nula o vacía.");
-    }
+   var connectionString = builder.Configuration["DefaultConnection"];
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString));
+   if (string.IsNullOrWhiteSpace(connectionString))
+   {
+       throw new InvalidOperationException("DefaultConnection not found");
+   }
 
-    
+   builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
     // Email
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
