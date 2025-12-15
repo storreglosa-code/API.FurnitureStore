@@ -75,23 +75,36 @@ try
     builder.Services.AddSingleton<IEmailSender, EmailService>();
 
 
- 
+    //---
 
-    var debugSecret = jwtConfigSection["Secret"];
+// 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
+    var secretFromEnv = Environment.GetEnvironmentVariable("JWTConfig__Secret");
+    Console.WriteLine($"SECRET VIA ENV VAR: {secretFromEnv?.Length ?? 0}");
 
-    if (string.IsNullOrEmpty(debugSecret))
+    // 2. Fallback a la lectura de la configuración de .NET (solo si la primera falla)
+    if (string.IsNullOrEmpty(secretFromEnv))
     {
-        debugSecret = builder.Configuration["JWTConfig:Secret"];
+        // Esto es lo que estaba fallando previamente, pero lo mantenemos para debug
+        secretFromEnv = builder.Configuration["JWTConfig:Secret"];
+        Console.WriteLine($"SECRET VIA CONFIG: {secretFromEnv?.Length ?? 0}");
     }
 
-    Console.WriteLine($"JWT SECRET LENGTH: {debugSecret?.Length ?? 0}");
-    Console.WriteLine("=== ENV VAR CHECK ===");
-    Console.WriteLine("JWTConfig__Secret raw: " + Environment.GetEnvironmentVariable("JWTConfig__Secret"));
-    Console.WriteLine("JWTConfig:Secret via config: " + builder.Configuration["JWTConfig:Secret"]);
 
-    // Llave JWT
-    var key = Encoding.ASCII.GetBytes(debugSecret);
+    // 3. Chequeo de seguridad y asignación de la clave
+    if (string.IsNullOrEmpty(secretFromEnv) || secretFromEnv.Length < 32)
+    {
+        // **CAUSA DEL ERROR IDX10703:** Si esto ocurre, la variable NO ESTÁ LLEGANDO al contenedor.
+        Console.Error.WriteLine("FATAL ERROR: JWT Secret Key no encontrada o es demasiado corta (min 32 caracteres).");
 
+        // Forzamos una excepción clara para que el log de Railway sea informativo
+        throw new InvalidOperationException("La clave 'JWTConfig__Secret' no se inyectó en el entorno del contenedor.");
+    }
+
+    // Ya que estamos seguros de que secretFromEnv tiene un valor, procedemos.
+    var key = Encoding.ASCII.GetBytes(secretFromEnv);
+
+    // --- FIN SECCIÓN DE LECTURA DE SECRETO JWT ---
+   
     var tokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuerSigningKey = true,
