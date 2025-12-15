@@ -78,7 +78,7 @@ try
     var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
 
     // 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
-    var secretFromEnv = Environment.GetEnvironmentVariable("JWTConfig__Secret");
+    var secretFromEnv = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
     Console.WriteLine($"SECRET VIA ENV VAR: {secretFromEnv?.Length ?? 0}");
 
     // 2. Fallback a la lectura de la configuración de .NET (solo si la primera falla)
