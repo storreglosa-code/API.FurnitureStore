@@ -67,40 +67,34 @@ try
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(connectionString));
 
-    // JWT
-    var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
+    
 
     // Email
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     builder.Services.AddSingleton<IEmailSender, EmailService>();
 
 
-    //---
+    // JWT
+    var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
 
-// 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
+    // 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
     var secretFromEnv = Environment.GetEnvironmentVariable("JWTConfig__Secret");
     Console.WriteLine($"SECRET VIA ENV VAR: {secretFromEnv?.Length ?? 0}");
 
     // 2. Fallback a la lectura de la configuración de .NET (solo si la primera falla)
     if (string.IsNullOrEmpty(secretFromEnv))
     {
-        // Esto es lo que estaba fallando previamente, pero lo mantenemos para debug
         secretFromEnv = builder.Configuration["JWTConfig:Secret"];
         Console.WriteLine($"SECRET VIA CONFIG: {secretFromEnv?.Length ?? 0}");
     }
 
-
     // 3. Chequeo de seguridad y asignación de la clave
     if (string.IsNullOrEmpty(secretFromEnv) || secretFromEnv.Length < 32)
     {
-        // **CAUSA DEL ERROR IDX10703:** Si esto ocurre, la variable NO ESTÁ LLEGANDO al contenedor.
         Console.Error.WriteLine("FATAL ERROR: JWT Secret Key no encontrada o es demasiado corta (min 32 caracteres).");
-
-        // Forzamos una excepción clara para que el log de Railway sea informativo
         throw new InvalidOperationException("La clave 'JWTConfig__Secret' no se inyectó en el entorno del contenedor.");
     }
 
-    // Ya que estamos seguros de que secretFromEnv tiene un valor, procedemos.
     var key = Encoding.ASCII.GetBytes(secretFromEnv);
 
     // --- FIN SECCIÓN DE LECTURA DE SECRETO JWT ---
@@ -152,18 +146,28 @@ try
 
     var app = builder.Build();
 
-    app.MapGet("/health/db", async (AppDbContext db) =>
+    // --- Bloque para Aplicar Migraciones ---
+    using (var scope = app.Services.CreateScope())
     {
+        var services = scope.ServiceProvider;
         try
         {
-            var canConnect = await db.Database.CanConnectAsync();
-            return Results.Ok(new { postgres = canConnect });
+            var context = services.GetRequiredService<ApplicationDbContext>(); // Reemplaza con el nombre de tu DbContext
+
+            Console.WriteLine("Applying migrations...");
+            context.Database.Migrate(); // Aplica todas las migraciones pendientes
+            Console.WriteLine("Migrations applied successfully.");
+
         }
         catch (Exception ex)
         {
-            return Results.Problem(ex.Message);
+            // Esto es crucial para debuggear si la conexión o la migración falla
+            Console.Error.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+            // Opcional: registrar el error con un logger si lo tienes
+            logger.Error(ex, "An error occurred while migrating the database.");
         }
-    });
+    }
+    // --- Fin del Bloque de Migraciones ---
 
     app.UseCors("AllowLocalFrontend");
 
