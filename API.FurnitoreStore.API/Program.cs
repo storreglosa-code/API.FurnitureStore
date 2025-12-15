@@ -78,7 +78,7 @@ try
     //---
 
 // 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
-    var secretFromEnv = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    var secretFromEnv = Environment.GetEnvironmentVariable("JWTConfig__Secret");
     Console.WriteLine($"SECRET VIA ENV VAR: {secretFromEnv?.Length ?? 0}");
 
     // 2. Fallback a la lectura de la configuración de .NET (solo si la primera falla)
@@ -151,6 +151,19 @@ try
     });
 
     var app = builder.Build();
+
+    app.MapGet("/health/db", async (AppDbContext db) =>
+    {
+        try
+        {
+            var canConnect = await db.Database.CanConnectAsync();
+            return Results.Ok(new { postgres = canConnect });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(ex.Message);
+        }
+    });
 
     app.UseCors("AllowLocalFrontend");
 
