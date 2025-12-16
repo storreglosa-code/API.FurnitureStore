@@ -58,15 +58,49 @@ try
         });
     });
 
-    var host = "postgres.railway.internal";
-    var port = "5432";
-    var database = "railway";
-    var username = "postgres";
-    var password = "oBqrrgHjqhqXTmJdAZXnWBbMqakhATel";
 
-    var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    Console.WriteLine($"Variable de Entorno: {envDbUrl}");
+    
+    if (string.IsNullOrEmpty(envDbUrl))
+    {
+        throw new Exception("DATABASE_URL no está definida");
+    }
+    
+    var uri = new Uri(envDbUrl);
+    
+    // Usuario y password
+    var userInfo = uri.UserInfo.Split(':');
+    var username = userInfo[0];
+    var password = userInfo[1];
+    
+    // Host y puerto
+    var host = uri.Host;
+    var port = uri.Port;
+    
+    // Base de datos (quita la / inicial)
+    var database = uri.AbsolutePath.TrimStart('/');
+    
+    // Connection string final
+    var connectionString =
+    $"Host={host};" +
+    $"Port={port};" +
+    $"Database={database};" +
+    $"Username={username};" +
+    $"Password={password};" +
+    $"SSL Mode=Require;" +
+    $"Trust Server Certificate=true";
 
-   Console.WriteLine($"Connection String: {connectionString}");
+    
+    //var host = "postgres.railway.internal";
+    //var port = "5432";
+    //var database = "railway";
+    //var username = "postgres";
+    //var password = "oBqrrgHjqhqXTmJdAZXnWBbMqakhATel";
+
+    //var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+
+   Console.WriteLine($"Parsed Connection String: {connectionString}");
 
    if (string.IsNullOrWhiteSpace(connectionString))
    {
