@@ -17,6 +17,8 @@ logger.Debug("Init main");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
     // Cargar configuración (COMPATIBLE CON RAILWAY)
     builder.Configuration
@@ -75,39 +77,30 @@ try
     var password = userInfo[1];
     
     // Host y puerto
-    var host = uri.Host;
-    var port = uri.Port;
+    var dbHost = uri.Host;
+    var dbPort = uri.Port;
     
     // Base de datos (quita la / inicial)
     var database = uri.AbsolutePath.TrimStart('/');
     
     // Connection string final
     var connectionString =
-    $"Host={host};" +
-    $"Port={port};" +
+    $"Host={dbHost};" +
+    $"Port={dbPort};" +
     $"Database={database};" +
     $"Username={username};" +
     $"Password={password};" +
     $"SSL Mode=Require;" +
     $"Trust Server Certificate=true";
 
-    
-    //var host = "postgres.railway.internal";
-    //var port = "5432";
-    //var database = "railway";
-    //var username = "postgres";
-    //var password = "oBqrrgHjqhqXTmJdAZXnWBbMqakhATel";
+    Console.WriteLine($"Parsed Connection String: {connectionString}");
 
-    //var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        throw new InvalidOperationException("DefaultConnection not found");
+    }
 
-   Console.WriteLine($"Parsed Connection String: {connectionString}");
-
-   if (string.IsNullOrWhiteSpace(connectionString))
-   {
-       throw new InvalidOperationException("DefaultConnection not found");
-   }
-
-   builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
     // Email
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
@@ -218,7 +211,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
-
+    app.MapGet("/ping", () => "pong");
     app.Run();
 }
 catch (Exception e)
