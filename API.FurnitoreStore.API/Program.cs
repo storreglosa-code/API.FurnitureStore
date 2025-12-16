@@ -172,7 +172,7 @@ try
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
-    var allowedOrigins = new[] { "http://localhost:5500", "http://127.0.0.1:5500" };
+    var allowedOrigins = new[] { "http://localhost:5500", "http://127.0.0.1:5500", "https://talentotech-frontendjs-production.up.railway.app" };
 
     builder.Services.AddCors(options =>
     {
