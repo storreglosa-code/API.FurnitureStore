@@ -57,17 +57,25 @@ namespace API.FurnitoreStore.API.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             //Verify if email exists
-            var emailExists = await _userManager.FindByEmailAsync(request.EmailAddress);
+            try
+            {
+                var emailExists = await _userManager.FindByEmailAsync(request.EmailAddress);
 
-            if (emailExists != null)
-                return BadRequest(new LoginResponse()
-                {
-                    Result = false,
-                    Errors = new List<string>()
+                if (emailExists != null)
+                    return BadRequest(new LoginResponse()
+                    {
+                        Result = false,
+                        Errors = new List<string>()
                     {
                         "Email already exists"
                     }
-                });
+                    });
+            }
+            catch (Exception ex)
+            {
+
+                throw new InvalidOperationException($"Error al validar email: {ex}");
+            }
 
             //Create user
             var user = new IdentityUser()
@@ -77,33 +85,40 @@ namespace API.FurnitoreStore.API.Controllers
                 EmailConfirmed=false
             };
 
-            var isCreated = await _userManager.CreateAsync(user,request.Password);
-
-            if (isCreated.Succeeded)
+            try
             {
-                await SendVerificationEmail(user);
+                var isCreated = await _userManager.CreateAsync(user, request.Password);
 
-                _logger.LogWarning("Usuario creado",user);
-                return Ok(new LoginResponse()
+                if (isCreated.Succeeded)
                 {
-                    Result = true,
-                    Errors = new List<string>() 
+                    await SendVerificationEmail(user);
+
+                    _logger.LogWarning("Usuario creado", user);
+                    return Ok(new LoginResponse()
+                    {
+                        Result = true,
+                        Errors = new List<string>()
                     {
                         "To continue your email must be confirmed"
                     }
-                });
-            }
-            else
-            { 
-                var errors = new List<string>();
-                foreach (var err in isCreated.Errors)
-                    errors.Add(err.Description);
+                    });
+                }
+                else
+                {
+                    var errors = new List<string>();
+                    foreach (var err in isCreated.Errors)
+                        errors.Add(err.Description);
 
-                return BadRequest(new LoginResponse
-                { 
-                    Result = false,
-                    Errors = errors
-                });
+                    return BadRequest(new LoginResponse
+                    {
+                        Result = false,
+                        Errors = errors
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error al intentar crear usuario: {ex}");
             }
 
         }
