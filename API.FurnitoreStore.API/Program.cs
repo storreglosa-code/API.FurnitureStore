@@ -57,9 +57,15 @@ try
             }
         });
     });
-    
 
-   var connectionString = builder.Configuration["DefaultConnection"];
+    var host = Environment.GetEnvironmentVariable("PGHOST");
+    var port = Environment.GetEnvironmentVariable("PGPORT");
+    var database = Environment.GetEnvironmentVariable("PGDATABASE");
+    var username = Environment.GetEnvironmentVariable("PGUSER");
+    var password = Environment.GetEnvironmentVariable("PGPASSWORD");
+
+    var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+
    Console.WriteLine($"Connection String: {connectionString}");
 
    if (string.IsNullOrWhiteSpace(connectionString))
