@@ -74,7 +74,8 @@ namespace API.FurnitoreStore.API.Controllers
             catch (Exception ex)
             {
 
-                throw new InvalidOperationException($"Error al validar email: {ex}");
+                Console.WriteLine("FindByEmailAsync ERROR");
+                Console.WriteLine(ex.ToString());
             }
 
             //Create user
@@ -118,7 +119,8 @@ namespace API.FurnitoreStore.API.Controllers
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Error al intentar crear usuario: {ex}");
+                Console.WriteLine("CreateAsync ERROR");
+                Console.WriteLine(ex.ToString());
             }
 
         }
