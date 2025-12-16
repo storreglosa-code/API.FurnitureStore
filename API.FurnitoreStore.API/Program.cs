@@ -58,11 +58,11 @@ try
         });
     });
 
-    var host = Environment.GetEnvironmentVariable("PGHOST");
-    var port = Environment.GetEnvironmentVariable("PGPORT");
-    var database = Environment.GetEnvironmentVariable("PGDATABASE");
-    var username = Environment.GetEnvironmentVariable("PGUSER");
-    var password = Environment.GetEnvironmentVariable("PGPASSWORD");
+    var host = "postgres.railway.internal";
+    var port = "5432";
+    var database = "railway";
+    var username = "postgres";
+    var password = "oBqrrgHjqhqXTmJdAZXnWBbMqakhATel";
 
     var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
 
