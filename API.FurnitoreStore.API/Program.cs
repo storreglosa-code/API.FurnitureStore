@@ -17,8 +17,8 @@ logger.Debug("Init main");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    //var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    //builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
     // Cargar configuración (COMPATIBLE CON RAILWAY)
     builder.Configuration
@@ -110,28 +110,9 @@ try
 
     // JWT
     var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
-
-    // 1. Prioriza la lectura directa de la variable de entorno con el nombre Docker/Railway
     var secretFromEnv = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-    Console.WriteLine($"SECRET VIA ENV VAR: {secretFromEnv?.Length ?? 0}");
-
-    // 2. Fallback a la lectura de la configuración de .NET (solo si la primera falla)
-    if (string.IsNullOrEmpty(secretFromEnv))
-    {
-        secretFromEnv = builder.Configuration["JWTConfig:Secret"];
-        Console.WriteLine($"SECRET VIA CONFIG: {secretFromEnv?.Length ?? 0}");
-    }
-
-    // 3. Chequeo de seguridad y asignación de la clave
-    if (string.IsNullOrEmpty(secretFromEnv) || secretFromEnv.Length < 32)
-    {
-        Console.Error.WriteLine("FATAL ERROR: JWT Secret Key no encontrada o es demasiado corta (min 32 caracteres).");
-        throw new InvalidOperationException("La clave 'JWTConfig__Secret' no se inyectó en el entorno del contenedor.");
-    }
 
     var key = Encoding.ASCII.GetBytes(secretFromEnv);
-
-    // --- FIN SECCIÓN DE LECTURA DE SECRETO JWT ---
    
     var tokenValidationParameters = new TokenValidationParameters()
     {
