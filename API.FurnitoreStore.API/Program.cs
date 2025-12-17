@@ -101,7 +101,7 @@ try
     }
 
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
-
+    
     // Email
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     builder.Services.AddSingleton<IEmailSender, EmailService>();
@@ -210,8 +210,11 @@ try
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();
+
     app.MapControllers();
-    app.MapGet("/ping", () => "pong");
+    app.MapHealthChecks("/health");
+
+
     app.Run();
 }
 catch (Exception e)
