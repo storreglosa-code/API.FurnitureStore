@@ -60,6 +60,7 @@ try
         });
     });
 
+    builder.Services.AddHealthChecks();
 
     var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     Console.WriteLine($"Variable de Entorno: {envDbUrl}");
