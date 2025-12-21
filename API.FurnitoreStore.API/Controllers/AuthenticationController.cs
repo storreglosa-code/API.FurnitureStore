@@ -83,7 +83,7 @@ namespace API.FurnitoreStore.API.Controllers
             {
                 Email = request.EmailAddress,
                 UserName = request.EmailAddress,
-                EmailConfirmed=false
+                EmailConfirmed = true
             };
 
             try
@@ -92,7 +92,7 @@ namespace API.FurnitoreStore.API.Controllers
 
                 if (isCreated.Succeeded)
                 {
-                    await SendVerificationEmail(user);
+                    //await SendVerificationEmail(user);
 
                     _logger.LogWarning("Usuario creado", user);
                     return Ok(new LoginResponse()
