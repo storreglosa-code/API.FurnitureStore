@@ -102,10 +102,19 @@ try
     }
 
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
-    
+
     // Email
-    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
-    builder.Services.AddSingleton<IEmailSender, EmailService>();
+    //builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+    builder.Services.Configure<SmtpSettings>(options =>
+    {
+        options.Host = Environment.GetEnvironmentVariable("SMTP_HOST")!;
+        options.User = Environment.GetEnvironmentVariable("SMTP_USER")!;
+        options.Password = Environment.GetEnvironmentVariable("SMTP_PWD")!;
+        options.Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT")!);
+    });
+    builder.Services.AddScoped<IEmailSender, EmailService>();
+   
+
 
 
     // JWT
