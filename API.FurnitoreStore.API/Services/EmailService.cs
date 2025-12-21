@@ -4,25 +4,21 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace API.FurnitoreStore.API.Services;
-
+namespace API.FurnitoreStore.API.Services
+{
     public class EmailService : IEmailSender
     {
         private readonly SmtpSettings _smtpSettings;
-        public EmailService(IOptions<SmtpSettings> smtpSettings) 
-        {
+        public EmailService(IOptions<SmtpSettings> smtpSettings) {
+
             _smtpSettings = smtpSettings.Value;
         }
-
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
 
             try
             {
-            Console.WriteLine($"SMTP HOST: {_settings.Host}");
-            Console.WriteLine($"SMTP PORT: {_settings.Port}");
-            Console.WriteLine($"SMTP USER: {_settings.User}");
-            var message = new MimeMessage();
+                var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(_smtpSettings.SenderName,_smtpSettings.SenderEmail));
                 message.To.Add(new MailboxAddress("", email));
                 message.Subject = subject;
@@ -37,14 +33,12 @@ namespace API.FurnitoreStore.API.Services;
                 }
             }
             catch (Exception)
-        {
-            Console.WriteLine($"SMTP HOST: {_settings.Host}");
-            Console.WriteLine($"SMTP PORT: {_settings.Port}");
-            Console.WriteLine($"SMTP USER: {_settings.User}");
-            throw;
+            {
+
+                throw;
             }
 
 
         }
     }
-
+}
