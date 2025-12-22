@@ -62,7 +62,7 @@ try
 
     builder.Services.AddHealthChecks();
 
-    var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var envDbUrl = builder.Configuration.GetConnectionString("DefaultConnection") ?? Environment.GetEnvironmentVariable("DATABASE_URL");
     Console.WriteLine($"Variable de Entorno: {envDbUrl}");
     
     if (string.IsNullOrEmpty(envDbUrl))
@@ -110,7 +110,7 @@ try
 
     // JWT
     var jwtConfigSection = builder.Configuration.GetSection("JWTConfig");
-    var secretFromEnv = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    var secretFromEnv = "TMaYT2DQw0JHicUQSnQFu0JBKqCYBTLuj2c2" ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
     var key = Encoding.ASCII.GetBytes(secretFromEnv);
    
@@ -148,7 +148,6 @@ try
     builder.Host.UseNLog();
 
     var allowedOrigins = new[] { "http://localhost:5500", "http://127.0.0.1:5500", "https://talentotech-frontendjs-production.up.railway.app" };
-
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowLocalFrontend", policy =>
@@ -183,7 +182,7 @@ try
         }
     }
     // --- Fin del Bloque de Migraciones ---
-
+    app.UseRouting();
     app.UseCors("AllowLocalFrontend");
 
     app.UseSwagger();
