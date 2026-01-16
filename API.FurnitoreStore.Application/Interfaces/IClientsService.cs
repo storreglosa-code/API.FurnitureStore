@@ -7,7 +7,7 @@ using API.FurnitoreStore.Share;
 
 namespace API.FurnitoreStore.Application.Interfaces;
 
-public interface IClientsService
+public interface IClientsService //TODO: Add logging and async methods
 {
     IEnumerable<Client> GetAll();
     Client GetById(int id);

@@ -9,10 +9,10 @@ using API.FornitureStore.Data;
 
 namespace API.FurnitoreStore.Application.Services;
 
-public class ClientsService(ApplicationDbContext context) : IClientsService
+public class ClientsService(ApplicationDbContext context) : IClientsService //TODO: Add logging and async methods
 
 {
-    public bool Create(Client client)
+    public bool Create(Client client) 
     {
         try
         {
@@ -22,7 +22,7 @@ public class ClientsService(ApplicationDbContext context) : IClientsService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception("Error al crear cliente",ex);
         }
     }
 
@@ -41,7 +41,7 @@ public class ClientsService(ApplicationDbContext context) : IClientsService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception("Error al intentar eliminar cliente",ex);
         }
     }
 
@@ -54,7 +54,7 @@ public class ClientsService(ApplicationDbContext context) : IClientsService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception("Error al traer la información", ex);
         }
     }
 
@@ -67,7 +67,7 @@ public class ClientsService(ApplicationDbContext context) : IClientsService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception("Error al traer la información", ex);
         }
     }
 
@@ -90,7 +90,7 @@ public class ClientsService(ApplicationDbContext context) : IClientsService
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            throw new Exception("Error al actualizar cliente", ex);
         }
     }
 }
