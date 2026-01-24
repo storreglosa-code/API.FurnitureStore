@@ -6,50 +6,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using API.FornitureStore.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.FurnitoreStore.Application.Services;
 
 public class ClientsService(ApplicationDbContext context) : IClientsService //TODO: Add logging and async methods
 
 {
-    public bool Create(Client client) 
+    public async Task<IEnumerable<Client>> GetAllAsync()
     {
         try
         {
-            context.Clients.Add(client);
-            context.SaveChanges();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al crear cliente",ex);
-        }
-    }
-
-    public bool Delete(int id)
-    {
-        try
-        {
-            Client client = context.Clients.Find(id);
-            if (client == null)
-            {
-                return false;
-            }
-            context.Remove(client);
-            context.SaveChanges();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al intentar eliminar cliente",ex);
-        }
-    }
-
-    public IEnumerable<Client> GetAll()
-    {
-        try
-        {
-            var clients = context.Clients.ToList();
+            var clients = await context.Clients.ToListAsync();
             return clients;
         }
         catch (Exception ex)
@@ -58,11 +26,11 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
         }
     }
 
-    public Client GetById(int id)
+    public async Task<Client> GetByIdAsync(int id)
     {
         try
         {
-            var client = context.Clients.Where(c => c.Id == id).FirstOrDefault();
+            Client? client = await context.Clients.FindAsync(id);
             return client;
         }
         catch (Exception ex)
@@ -71,22 +39,49 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
         }
     }
 
-    public Client Update(Client client)
+    public async Task CreateAsync(Client client) 
     {
         try
         {
-            var updatedClient = context.Clients.Where(c => c.Id == client.Id).FirstOrDefault();
-            if (updatedClient == null)
+            await context.Clients.AddAsync(client);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al crear cliente",ex);
+        }
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        try
+        {
+            Client? client = await context.Clients.FindAsync(id);
+            if (client == null)
+            {
+                throw new Exception("Error al encontrar cliente");
+            }
+            context.Remove(client);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al intentar eliminar cliente",ex);
+        }
+    }
+
+  
+    public async Task UpdateAsync (Client client)
+    {
+        try
+        {
+            Client? clientToUpdate = await context.Clients.FindAsync(client.Id);
+            if (clientToUpdate == null)
             {
                 throw new Exception("Client not found");
             }
-            updatedClient.FirstName = client.FirstName;
-            updatedClient.LastName = client.LastName;
-            updatedClient.BirthDate = client.BirthDate;
-            updatedClient.Phone = client.Phone;
-            updatedClient.Address = client.Address;
-            context.SaveChanges();
-            return updatedClient;
+            context.Update(client);
+            await context.SaveChangesAsync();
         }
         catch (Exception ex)
         {

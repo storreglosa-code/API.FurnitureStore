@@ -14,16 +14,18 @@ namespace API.FurnitoreStore.API.Controllers;
 [ApiController]
 public class ClientsController(IClientsService clientService) : ControllerBase //TODO: Add logging and call async methods
 {
+
     [HttpGet]
-    public async Task<IEnumerable<Client>> GetClients ()
+    public async Task<IActionResult> GetClients ()
     {
-        return clientService.GetAll();
+        var clients = await clientService.GetAllAsync();
+        return Ok(clients);
     }
 
     [HttpGet ("{id}")]
     public async Task<IActionResult> GetDetails(int id) 
     {
-        var client = clientService.GetById(id);
+        var client = await clientService.GetByIdAsync(id);
         if (client == null) return NotFound(); 
         return Ok(client);
     }
@@ -31,21 +33,21 @@ public class ClientsController(IClientsService clientService) : ControllerBase /
     [HttpPost]
     public async Task<IActionResult> Post (Client client) 
     {
-        clientService.Create(client);
+        await clientService.CreateAsync(client);
         return CreatedAtAction("Post", client.Id, client);
     }
 
     [HttpPut]
-    public async Task<IActionResult> Put(Client client)
+    public async Task<IActionResult> Update(Client client)
     { 
-        clientService.Update(client);
+        await clientService.UpdateAsync(client);
         return NoContent();
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     { 
-        clientService.Delete(id);
+        await clientService.DeleteAsync(id);
         return NoContent();
     }
 }
