@@ -57,53 +57,71 @@ namespace API.FurnitoreStore.API.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             //Verify if email exists
-            var emailExists = await _userManager.FindByEmailAsync(request.EmailAddress);
+            try
+            {
+                var emailExists = await _userManager.FindByEmailAsync(request.EmailAddress);
 
-            if (emailExists != null)
-                return BadRequest(new LoginResponse()
-                {
-                    Result = false,
-                    Errors = new List<string>()
+                if (emailExists != null)
+                    return BadRequest(new LoginResponse()
+                    {
+                        Result = false,
+                        Errors = new List<string>()
                     {
                         "Email already exists"
                     }
-                });
+                    });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FindByEmailAsync ERROR");
+                Console.WriteLine(ex.ToString());
+                return BadRequest();
+            }
 
             //Create user
             var user = new IdentityUser()
             {
                 Email = request.EmailAddress,
                 UserName = request.EmailAddress,
-                EmailConfirmed=false
+                EmailConfirmed = true
             };
 
-            var isCreated = await _userManager.CreateAsync(user,request.Password);
-
-            if (isCreated.Succeeded)
+            try
             {
-                await SendVerificationEmail(user);
+                var isCreated = await _userManager.CreateAsync(user, request.Password);
 
-                _logger.LogWarning("Usuario creado",user);
-                return Ok(new LoginResponse()
+                if (isCreated.Succeeded)
                 {
-                    Result = true,
-                    Errors = new List<string>() 
+                    //await SendVerificationEmail(user);
+
+                    _logger.LogWarning("Usuario creado", user);
+                    return Ok(new LoginResponse()
+                    {
+                        Result = true,
+                        Errors = new List<string>()
                     {
                         "To continue your email must be confirmed"
                     }
-                });
-            }
-            else
-            { 
-                var errors = new List<string>();
-                foreach (var err in isCreated.Errors)
-                    errors.Add(err.Description);
+                    });
+                }
+                else
+                {
+                    var errors = new List<string>();
+                    foreach (var err in isCreated.Errors)
+                        errors.Add(err.Description);
 
-                return BadRequest(new LoginResponse
-                { 
-                    Result = false,
-                    Errors = errors
-                });
+                    return BadRequest(new LoginResponse
+                    {
+                        Result = false,
+                        Errors = errors
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("CreateAsync ERROR");
+                Console.WriteLine(ex.ToString());
+                return BadRequest();
             }
 
         }
@@ -140,7 +158,7 @@ namespace API.FurnitoreStore.API.Controllers
                 Result = false
             });
 
-            var authenticatedUser = GenerateTokenAsync(existingUser);
+            var authenticatedUser = await GenerateTokenAsync(existingUser);
 
             return Ok(authenticatedUser); 
         
@@ -178,6 +196,7 @@ namespace API.FurnitoreStore.API.Controllers
         private async Task<LoginResponse> GenerateTokenAsync(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler(); //Es la clase que va a crear el token propiamente dicho
+          
             var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
 
             var tokenDescriptor = new SecurityTokenDescriptor()
@@ -193,7 +212,7 @@ namespace API.FurnitoreStore.API.Controllers
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iss, _jwtConfig.Issuer)
 
                 })),
-                Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTime),
+                Expires = DateTime.UtcNow.Add(TimeSpan.Parse(_jwtConfig.ExpiryTime.ToString())),
                 SigningCredentials = new SigningCredentials (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 

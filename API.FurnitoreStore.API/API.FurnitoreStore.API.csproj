@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\API.FornitureStore.Data\API.FornitureStore.Data.csproj" />
+    <ProjectReference Include="..\API.FurnitoreStore.Application\API.FurnitoreStore.Application.csproj" />
     <ProjectReference Include="..\API.FurnitoreStore.Share\API.FurnitoreStore.Share.csproj" />
   </ItemGroup>
 

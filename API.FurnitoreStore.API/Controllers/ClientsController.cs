@@ -1,4 +1,5 @@
 ﻿using API.FornitureStore.Data;
+using API.FurnitoreStore.Application.Interfaces;
 using API.FurnitoreStore.Share;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -6,58 +7,47 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace API.FurnitoreStore.API.Controllers
+namespace API.FurnitoreStore.API.Controllers;
+
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class ClientsController(IClientsService clientService) : ControllerBase //TODO: Add logging
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ClientsController : ControllerBase
+
+    [HttpGet]
+    public async Task<IActionResult> GetClients ()
     {
-        private readonly ApplicationDbContext _context;
-        public ClientsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        var clients = await clientService.GetAllAsync();
+        return Ok(clients);
+    }
 
-        [HttpGet]
-        public async Task<IEnumerable<Client>> GetClients ()
-        {
-            return await _context.Clients.ToListAsync();
-        }
+    [HttpGet ("{id}")]
+    public async Task<IActionResult> GetDetails(int id) 
+    {
+        var client = await clientService.GetByIdAsync(id);
+        if (client == null) return NotFound(); 
+        return Ok(client);
+    }
 
-        [HttpGet ("{id}")]
-        public async Task<IActionResult> GetDetails(int id) 
-        {
-            var client = await _context.Clients.FirstOrDefaultAsync(c => c.Id == id);
+    [HttpPost]
+    public async Task<IActionResult> Post (Client client) 
+    {
+        await clientService.CreateAsync(client);
+        return CreatedAtAction("Post", client.Id, client);
+    }
 
-            if (client == null) return NotFound(); 
-            return Ok(client);
-        }
+    [HttpPut]
+    public async Task<IActionResult> Update(Client client)
+    { 
+        await clientService.UpdateAsync(client);
+        return NoContent();
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Post (Client client) 
-        {
-            await _context.Clients.AddAsync(client);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("Post", client.Id, client);
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> Put(Client client)
-        { 
-            _context.Clients.Update(client);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> Delete(Client client)
-        { 
-            if (client == null) 
-                return NotFound();
-            _context.Clients.Remove(client);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int id)
+    { 
+        await clientService.DeleteAsync(id);
+        return NoContent();
     }
 }

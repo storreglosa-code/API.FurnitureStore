@@ -1,0 +1,8 @@
+[build]
+# Define el path donde está tu Dockerfile (asume la raíz)
+dockerfile = "Dockerfile"
+
+[deploy]
+# Define el comando que se ejecuta en el contenedor una vez construido.
+# Aseguramos que se use el mismo ENTRYPOINT que tu Dockerfile.
+start_command = "dotnet API.FurnitoreStore.API.dll"
