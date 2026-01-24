@@ -80,7 +80,11 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
             {
                 throw new Exception("Client not found");
             }
-            context.Update(client);
+            clientToUpdate.BirthDate = client.BirthDate;
+            clientToUpdate.Phone = client.Phone;
+            clientToUpdate.Address = client.Address;
+            clientToUpdate.FirstName = client.FirstName;
+            clientToUpdate.LastName = client.LastName;
             await context.SaveChangesAsync();
         }
         catch (Exception ex)

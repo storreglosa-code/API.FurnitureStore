@@ -12,7 +12,7 @@ namespace API.FurnitoreStore.API.Controllers;
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class ClientsController(IClientsService clientService) : ControllerBase //TODO: Add logging and call async methods
+public class ClientsController(IClientsService clientService) : ControllerBase //TODO: Add logging
 {
 
     [HttpGet]

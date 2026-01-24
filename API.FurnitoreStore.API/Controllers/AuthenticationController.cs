@@ -196,7 +196,8 @@ namespace API.FurnitoreStore.API.Controllers
         private async Task<LoginResponse> GenerateTokenAsync(IdentityUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler(); //Es la clase que va a crear el token propiamente dicho
-            var key = Encoding.UTF8.GetBytes("TMaYT2DQw0JHicUQSnQFu0JBKqCYBTLuj2c2");
+          
+            var key = Encoding.UTF8.GetBytes(_jwtConfig.Secret);
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
@@ -207,11 +208,11 @@ namespace API.FurnitoreStore.API.Controllers
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Email, user.Email),
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), //Hace referencia a JWT Id. Es el ID del Token en sí.
                     new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
-                    new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Aud, "FurnitoreStoreUsers"),
-                    new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iss, "FurnitoreStore")
+                    new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Aud, _jwtConfig.Audience),
+                    new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Iss, _jwtConfig.Issuer)
 
                 })),
-                Expires = DateTime.UtcNow.Add(TimeSpan.Parse("01:00")),
+                Expires = DateTime.UtcNow.Add(TimeSpan.Parse(_jwtConfig.ExpiryTime.ToString())),
                 SigningCredentials = new SigningCredentials (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
 
