@@ -37,6 +37,7 @@ options.UseNpgsql(connectionString);
 
 //DI
 builder.Services.AddScoped<IClientsService, ClientsService>();
+builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
 
 //IDENTITY
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>

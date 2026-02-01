@@ -1,4 +1,5 @@
 ﻿using API.FornitureStore.Data;
+using API.FurnitoreStore.Application.Interfaces;
 using API.FurnitoreStore.Share;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,24 +11,18 @@ namespace API.FurnitoreStore.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductCategoriesController : ControllerBase
+    public class ProductCategoriesController (IProductCategoriesService productCategoryService): ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        public ProductCategoriesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         [HttpGet]
         public async Task<IEnumerable<ProductCategory>> GetCategories()
         {
-            return await _context.ProductCategories.ToListAsync();
+            return await productCategoryService.GetAllAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetails(int id)
         {
-            var prodCategory = await _context.ProductCategories.FirstOrDefaultAsync(pc => pc.Id == id);
+            var prodCategory = await productCategoryService.GetByIdAsync(id);
             if (prodCategory == null) 
                 return NotFound();
             return Ok(prodCategory);
@@ -39,16 +34,14 @@ namespace API.FurnitoreStore.API.Controllers
             if (prodCategory == null) 
                 return BadRequest();
 
-            await _context.ProductCategories.AddAsync(prodCategory);
-            await _context.SaveChangesAsync();
+            await productCategoryService.CreateAsync(prodCategory);
             return CreatedAtAction("Post", prodCategory.Id, prodCategory);
         }
 
         [HttpPut]
         public async Task<IActionResult> Put (ProductCategory prodCategory)
         {
-            _context.ProductCategories.Update(prodCategory);
-            await _context.SaveChangesAsync();
+            productCategoryService.UpdateAsync(prodCategory);
             return NoContent();
         }
 
@@ -57,8 +50,7 @@ namespace API.FurnitoreStore.API.Controllers
         {
             if (prodCategory == null)
                 return NotFound();
-            _context.ProductCategories.Remove(prodCategory);
-            await _context.SaveChangesAsync();
+            await productCategoryService.DeleteAsync(prodCategory.Id);
             return NoContent();
         }
     }
