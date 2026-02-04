@@ -28,7 +28,7 @@ namespace API.FurnitoreStore.API.Controllers
         [HttpGet ("{id}")]
         public async Task<IActionResult> GetDetails(int id)
         { 
-            var order = await _context.Orders.Include(o=>o.OrderDetails).FirstOrDefaultAsync();
+            var order = await _context.Orders.Include(od=>od.OrderDetails).FirstOrDefaultAsync(o=>o.Id==id);
             if (order == null) 
                 return NotFound();
             return Ok(order);
@@ -59,7 +59,8 @@ namespace API.FurnitoreStore.API.Controllers
             existingOrder.OrderNumber = order.OrderNumber;
             existingOrder.OrderDate = order.OrderDate;
             existingOrder.DeliveryDate = order.DeliveryDate;
-            existingOrder.ClientId = order.ClientId;
+            //existingOrder.ClientId = order.ClientId;
+            existingOrder.Observaciones = order.Observaciones;
 
             _context.OrderDetails.RemoveRange(existingOrder.OrderDetails);
             _context.Orders.Update(existingOrder);
