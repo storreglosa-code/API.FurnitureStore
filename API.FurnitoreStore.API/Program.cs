@@ -38,7 +38,8 @@ options.UseNpgsql(connectionString);
 //DI
 builder.Services.AddScoped<IClientsService, ClientsService>();
 builder.Services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
-
+builder.Services.AddScoped<IProductsService, ProductsService>();
+builder.Services.AddScoped<IOrdersService, OrdersService>();
 //IDENTITY
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 options.SignIn.RequireConfirmedAccount = true)
