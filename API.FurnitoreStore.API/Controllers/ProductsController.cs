@@ -1,10 +1,10 @@
 ﻿using API.FornitureStore.Data;
 using API.FurnitoreStore.Share;
+using API.FurnitoreStore.Application.Interfaces;
+using API.FurnitoreStore.Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using API.FurnitoreStore.Application.Interfaces;
 
 namespace API.FurnitoreStore.API.Controllers
 {
@@ -21,7 +21,7 @@ namespace API.FurnitoreStore.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Product>> Get()
+        public async Task<IEnumerable<ReadProductDto>> Get()
         {
             return await _productsService.GetAllAsync();
         }
@@ -32,45 +32,45 @@ namespace API.FurnitoreStore.API.Controllers
             var product = await _productsService.GetByIdAsync(id);
 
             if (product == null)
-                return BadRequest();
+                return NotFound();
 
             return Ok(product);
         }
 
         [HttpGet("GetByCategory/{productCategoryId}")]
-        public async Task<IEnumerable<Product>> GetByCategory(int productCategoryId)
+        public async Task<IEnumerable<ReadProductDto>> GetByCategory(int productCategoryId)
         {
             var products = await _productsService.GetAllAsync();
             return products.Where(p => p.ProductCategoryId == productCategoryId);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(Product product)
+        public async Task<IActionResult> Post(CreateProductDto createDto)
         {
-            if (product == null)
+            if (createDto == null)
                 return BadRequest();
 
-            await _productsService.CreateAsync(product);
-            return CreatedAtAction("Post", product.Id, product);
+            var created = await _productsService.CreateAsync(createDto);
+            return CreatedAtAction(nameof(GetDetails), new { id = created.Id }, created);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(Product product)
+        public async Task<IActionResult> Update(UpdateProductDto updateDto)
         {
-            if (product == null)
-                return NotFound();
+            if (updateDto == null)
+                return BadRequest();
 
-            await _productsService.UpdateAsync(product);
+            await _productsService.UpdateAsync(updateDto);
             return NoContent();
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(Product product)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (product == null)
-                return NotFound();
+            if (id <= 0)
+                return BadRequest();
 
-            await _productsService.DeleteAsync(product.Id);
+            await _productsService.DeleteAsync(id);
             return NoContent();
         }
     }
