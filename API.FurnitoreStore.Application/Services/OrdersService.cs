@@ -23,6 +23,7 @@ public class OrdersService : IOrdersService
         {
             return await _context.Orders
                                  .Include(o => o.OrderDetails)
+                                 .AsNoTracking()
                                  .ToListAsync();
         }
         catch (Exception ex)
@@ -37,6 +38,7 @@ public class OrdersService : IOrdersService
         {
             return await _context.Orders
                                  .Include(o => o.OrderDetails)
+                                 .AsNoTracking()
                                  .FirstOrDefaultAsync(o => o.Id == id);
         }
         catch (Exception ex)
@@ -81,7 +83,6 @@ public class OrdersService : IOrdersService
             existingOrder.OrderDate = order.OrderDate;
             existingOrder.DeliveryDate = order.DeliveryDate;
             existingOrder.Observaciones = order.Observaciones;
-            // keep client relationship as original code commented it out
 
             // replace details
             _context.OrderDetails.RemoveRange(existingOrder.OrderDetails);

@@ -62,7 +62,9 @@ namespace API.FurnitoreStore.Application.Services
         {
             try
             {
-                var products = await _context.Products.ToListAsync();
+                var products = await _context.Products
+                                             .AsNoTracking()
+                                             .ToListAsync();
                 return products.Select(MapToReadDto);
             }
             catch (Exception ex)
@@ -75,7 +77,9 @@ namespace API.FurnitoreStore.Application.Services
         {
             try
             {
-                var product = await _context.Products.FindAsync(id);
+                var product = await _context.Products
+                                            .AsNoTracking()
+                                            .FirstOrDefaultAsync(p => p.Id == id);
                 if (product == null) return null;
                 return MapToReadDto(product);
             }

@@ -34,7 +34,9 @@ namespace API.FurnitoreStore.Application.Services
         {
             try
             {
-                var productCategories = await context.ProductCategories.ToListAsync();
+                var productCategories = await context.ProductCategories
+                                                     .AsNoTracking()
+                                                     .ToListAsync();
                 return productCategories;
             }
             catch (Exception ex)
@@ -48,7 +50,9 @@ namespace API.FurnitoreStore.Application.Services
         {
             try
             {
-                ProductCategory? productCategory = await context.ProductCategories.FindAsync(id);
+                ProductCategory? productCategory = await context.ProductCategories
+                                                               .AsNoTracking()
+                                                               .FirstOrDefaultAsync(pc => pc.Id == id);
                 return productCategory;
             }
             catch (Exception ex)

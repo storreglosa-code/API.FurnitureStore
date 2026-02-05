@@ -17,7 +17,9 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
     {
         try
         {
-            var clients = await context.Clients.ToListAsync();
+            var clients = await context.Clients
+                                       .AsNoTracking()
+                                       .ToListAsync();
             return clients;
         }
         catch (Exception ex)
@@ -30,7 +32,9 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
     {
         try
         {
-            Client? client = await context.Clients.FindAsync(id);
+            Client? client = await context.Clients
+                                          .AsNoTracking()
+                                          .FirstOrDefaultAsync(c => c.Id == id);
             return client;
         }
         catch (Exception ex)
