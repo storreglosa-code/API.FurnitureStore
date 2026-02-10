@@ -1,58 +1,93 @@
-﻿using API.FurnitoreStore.Application.Interfaces;
-using API.FurnitoreStore.Share;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using API.FornitureStore.Data;
 using Microsoft.EntityFrameworkCore;
+using API.FornitureStore.Data;
+using API.FurnitoreStore.Application.Interfaces;
+using API.FurnitoreStore.Application.Dtos.Client;
+using API.FurnitoreStore.Share;
 
 namespace API.FurnitoreStore.Application.Services;
 
-public class ClientsService(ApplicationDbContext context) : IClientsService //TODO: Add logging and async methods
-
+public class ClientsService(ApplicationDbContext _context) : IClientsService
 {
-    public async Task<IEnumerable<Client>> GetAllAsync()
+    public async Task<IEnumerable<ReadClientDto>> GetAllAsync()
     {
         try
         {
-            var clients = await context.Clients
+            var clients = await _context.Clients
+                                        .AsNoTracking()
+                                        .ToListAsync();
+            return clients.Select(MapToReadDto);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error retrieving clients", ex);
+        }
+    }
+
+    public async Task<ReadClientDto?> GetByIdAsync(int id)
+    {
+        try
+        {
+            var client = await _context.Clients
                                        .AsNoTracking()
-                                       .ToListAsync();
-            return clients;
+                                       .FirstOrDefaultAsync(c => c.Id == id);
+            if (client == null) return null;
+            return MapToReadDto(client);
         }
         catch (Exception ex)
         {
-            throw new Exception("Error al traer la información", ex);
+            throw new Exception("Error retrieving client", ex);
         }
     }
 
-    public async Task<Client> GetByIdAsync(int id)
+    public async Task<ReadClientDto> CreateAsync(CreateClientDto dto)
     {
         try
         {
-            Client? client = await context.Clients
-                                          .AsNoTracking()
-                                          .FirstOrDefaultAsync(c => c.Id == id);
-            return client;
+            var entity = new Client
+            {
+                AspNetUserId = dto.AspNetUserId,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                BirthDate = dto.BirthDate,
+                Phone = dto.Phone,
+                Address = dto.Address
+            };
+
+            await _context.Clients.AddAsync(entity);
+            await _context.SaveChangesAsync();
+
+            return MapToReadDto(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Error al traer la información", ex);
+            throw new Exception("Error creating client", ex);
         }
     }
 
-    public async Task CreateAsync(Client client) 
+    public async Task UpdateAsync(UpdateClientDto dto)
     {
         try
         {
-            await context.Clients.AddAsync(client);
-            await context.SaveChangesAsync();
+            var existing = await _context.Clients.FindAsync(dto.Id);
+            if (existing == null)
+                throw new Exception("Client not found.");
+
+            existing.AspNetUserId = dto.AspNetUserId;
+            existing.FirstName = dto.FirstName;
+            existing.LastName = dto.LastName;
+            existing.BirthDate = dto.BirthDate;
+            existing.Phone = dto.Phone;
+            existing.Address = dto.Address;
+
+            await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            throw new Exception("Error al crear cliente",ex);
+            throw new Exception("Error updating client", ex);
         }
     }
 
@@ -60,40 +95,29 @@ public class ClientsService(ApplicationDbContext context) : IClientsService //TO
     {
         try
         {
-            Client? client = await context.Clients.FindAsync(id);
-            if (client == null)
-            {
-                throw new Exception("Error al encontrar cliente");
-            }
-            context.Remove(client);
-            await context.SaveChangesAsync();
+            var existing = await _context.Clients.FindAsync(id);
+            if (existing == null)
+                throw new Exception("Client not found.");
+
+            _context.Clients.Remove(existing);
+            await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            throw new Exception("Error al intentar eliminar cliente",ex);
+            throw new Exception("Error deleting client", ex);
         }
     }
 
-  
-    public async Task UpdateAsync (Client client)
-    {
-        try
+    // Manual mapping helper
+    private static ReadClientDto MapToReadDto(Client c) =>
+        new ReadClientDto
         {
-            Client? clientToUpdate = await context.Clients.FindAsync(client.Id);
-            if (clientToUpdate == null)
-            {
-                throw new Exception("Client not found");
-            }
-            clientToUpdate.BirthDate = client.BirthDate;
-            clientToUpdate.Phone = client.Phone;
-            clientToUpdate.Address = client.Address;
-            clientToUpdate.FirstName = client.FirstName;
-            clientToUpdate.LastName = client.LastName;
-            await context.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al actualizar cliente", ex);
-        }
-    }
+            Id = c.Id,
+            AspNetUserId = c.AspNetUserId,
+            FirstName = c.FirstName ?? string.Empty,
+            LastName = c.LastName ?? string.Empty,
+            BirthDate = c.BirthDate,
+            Phone = c.Phone ?? string.Empty,
+            Address = c.Address ?? string.Empty
+        };
 }

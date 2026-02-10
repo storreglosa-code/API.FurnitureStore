@@ -9,4 +9,4 @@
 - Follow naming conventions
 
 ## Project-Specific Rules
-- Prefers manual mapping between domain models and DTOs in the Application layer.
+- Prefers manual mapping between domain models and DTOs in the Application layer; controllers should remain flat and operate with DTOs.

@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.FurnitoreStore.Share;
+using API.FurnitoreStore.Application.Dtos.Client;
 
 namespace API.FurnitoreStore.Application.Interfaces;
 
 public interface IClientsService //TODO: Add logging 
 {
-    Task<IEnumerable<Client>> GetAllAsync();
-    Task<Client> GetByIdAsync(int id);
+    Task<IEnumerable<ReadClientDto>> GetAllAsync();
+    Task<ReadClientDto?> GetByIdAsync(int id);
 
-    Task CreateAsync(Client client);
+    Task<ReadClientDto> CreateAsync(CreateClientDto dto);
 
-    Task UpdateAsync(Client client);
+    Task UpdateAsync(UpdateClientDto dto);
 
     Task DeleteAsync(int id);
 }
