@@ -8,76 +8,74 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace API.FurnitoreStore.Application.Services
+namespace API.FurnitoreStore.Application.Services;
+public class ProductCategoriesService (ApplicationDbContext context): IProductCategoriesService
 {
-    public class ProductCategoriesService (ApplicationDbContext context): IProductCategoriesService
+    public async Task CreateAsync(ProductCategory productCategory)
     {
-        public async Task CreateAsync(ProductCategory productCategory)
+        try
         {
-            try
-            {
-                await context.ProductCategories.AddAsync(productCategory);
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception ("Error al crear Categoria" , ex);
-            }
+            await context.ProductCategories.AddAsync(productCategory);
+            await context.SaveChangesAsync();
         }
-
-        public Task DeleteAsync(int id)
+        catch (Exception ex)
         {
-            throw new NotImplementedException();
+            throw new Exception ("Error al crear Categoria" , ex);
         }
+    }
 
-        public async Task<IEnumerable<ProductCategory>> GetAllAsync()
+    public Task DeleteAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<ProductCategory>> GetAllAsync()
+    {
+        try
         {
-            try
-            {
-                var productCategories = await context.ProductCategories
-                                                     .AsNoTracking()
-                                                     .ToListAsync();
-                return productCategories;
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception ("Error al obtener información", ex);
-            }
+            var productCategories = await context.ProductCategories
+                                                 .AsNoTracking()
+                                                 .ToListAsync();
+            return productCategories;
         }
-
-        public async Task<ProductCategory> GetByIdAsync(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                ProductCategory? productCategory = await context.ProductCategories
-                                                               .AsNoTracking()
-                                                               .FirstOrDefaultAsync(pc => pc.Id == id);
-                return productCategory;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error al obtener información", ex);
-            }
+
+            throw new Exception ("Error al obtener información", ex);
         }
+    }
 
-        public async Task UpdateAsync(ProductCategory productCategory)
+    public async Task<ProductCategory> GetByIdAsync(int id)
+    {
+        try
         {
-            try
-            {
-                var existingCategory = await context.ProductCategories.FindAsync(productCategory.Id);
-                if (existingCategory == null)
-                {
-                    throw new Exception("La categoría del producto no existe.");
-                }
-                existingCategory.Name = productCategory.Name;
+            ProductCategory? productCategory = await context.ProductCategories
+                                                           .AsNoTracking()
+                                                           .FirstOrDefaultAsync(pc => pc.Id == id);
+            return productCategory;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al obtener información", ex);
+        }
+    }
 
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
+    public async Task UpdateAsync(ProductCategory productCategory)
+    {
+        try
+        {
+            var existingCategory = await context.ProductCategories.FindAsync(productCategory.Id);
+            if (existingCategory == null)
             {
-                throw new Exception("Error al actualizar Categoria", ex);
+                throw new Exception("La categoría del producto no existe.");
             }
+            existingCategory.Name = productCategory.Name;
+
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al actualizar Categoria", ex);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace API.FurnitoreStore.Application.Dtos;
+namespace API.FurnitoreStore.Application.Dtos.Product;
 
 public class ReadProductDto
 {

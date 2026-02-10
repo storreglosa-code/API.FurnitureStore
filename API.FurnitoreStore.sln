@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35728.132
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.FurnitoreStore.API", "API.FurnitoreStore.API\API.FurnitoreStore.API.csproj", "{0AF94B35-C074-4049-87A2-EF9B64D456F6}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.FornitureStore.Data", "API.FornitureStore.Data\API.FornitureStore.Data.csproj", "{FA5CAA96-3F46-46B9-8821-91461E2773DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.FurnitoreStore.Application", "API.FurnitoreStore.Application\API.FurnitoreStore.Application.csproj", "{CEE4F41E-F8E6-423E-B3C2-8AE564E9E29F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.FurnitoreStore.Tests", "API.FurnitoreStore.Tests\API.FurnitoreStore.Tests.csproj", "{DEA00130-5485-4D75-BBA3-B421CD83B134}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{CEE4F41E-F8E6-423E-B3C2-8AE564E9E29F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEE4F41E-F8E6-423E-B3C2-8AE564E9E29F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEE4F41E-F8E6-423E-B3C2-8AE564E9E29F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEA00130-5485-4D75-BBA3-B421CD83B134}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEA00130-5485-4D75-BBA3-B421CD83B134}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEA00130-5485-4D75-BBA3-B421CD83B134}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEA00130-5485-4D75-BBA3-B421CD83B134}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

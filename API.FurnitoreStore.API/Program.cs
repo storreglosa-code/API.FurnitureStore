@@ -151,12 +151,12 @@ try
 
     Console.WriteLine("Applying migrations...");
 
-Console.WriteLine("--------------------------------------------------");
-Console.WriteLine("EF CORE CONNECTION STRING:");
-Console.WriteLine(context.Database.GetConnectionString());
-Console.WriteLine("--------------------------------------------------");
+    Console.WriteLine("--------------------------------------------------");
+    Console.WriteLine("EF CORE CONNECTION STRING:");
+    Console.WriteLine(context.Database.GetConnectionString());
+    Console.WriteLine("--------------------------------------------------");
 
-context.Database.Migrate(); // Aplica todas las migraciones pendientes
+    context.Database.Migrate(); // Aplica todas las migraciones pendientes
     Console.WriteLine("Migrations applied successfully.");
 
 }
@@ -182,3 +182,6 @@ app.MapHealthChecks("/health");
 
 
 app.Run();
+
+
+public partial class Program { }

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API.FornitureStore.Data;
 using API.FurnitoreStore.Application.Interfaces;
-using API.FurnitoreStore.Application.Dtos;
 using API.FurnitoreStore.Share;
+using API.FurnitoreStore.Application.Dtos.Product;
 
 namespace API.FurnitoreStore.Application.Services
 {

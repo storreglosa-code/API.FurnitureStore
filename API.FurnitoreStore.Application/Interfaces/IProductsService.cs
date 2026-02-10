@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.FurnitoreStore.Application.Dtos;
+using API.FurnitoreStore.Application.Dtos.Product;
 
 namespace API.FurnitoreStore.Application.Interfaces
 {
