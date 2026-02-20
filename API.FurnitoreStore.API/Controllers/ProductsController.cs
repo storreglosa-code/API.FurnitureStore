@@ -21,13 +21,14 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ReadProductDto>> Get()
+    public async Task<ActionResult<IEnumerable<ReadProductDto>>> Get()
     {
-        return await _productsService.GetAllAsync();
+        var products = await _productsService.GetAllAsync();
+        return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetDetails(int id)
+    public async Task<ActionResult<ReadProductDto>> GetDetails(int id)
     {
         var product = await _productsService.GetByIdAsync(id);
 
@@ -38,14 +39,15 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("GetByCategory/{productCategoryId}")]
-    public async Task<IEnumerable<ReadProductDto>> GetByCategory(int productCategoryId)
+    public async Task<ActionResult<IEnumerable<ReadProductDto>>> GetByCategory(int productCategoryId)
     {
         var products = await _productsService.GetAllAsync();
-        return products.Where(p => p.ProductCategoryId == productCategoryId);
+        var filtered = products.Where(p => p.ProductCategoryId == productCategoryId);
+        return Ok(filtered);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateProductDto createDto)
+    public async Task<ActionResult<ReadProductDto>> Post(CreateProductDto createDto)
     {
         if (createDto == null)
             return BadRequest();

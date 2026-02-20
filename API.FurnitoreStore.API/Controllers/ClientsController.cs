@@ -12,13 +12,14 @@ namespace API.FurnitoreStore.API.Controllers;
 public class ClientsController(IClientsService _clientsService) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<ReadClientDto>> GetClients()
+    public async Task<ActionResult<IEnumerable<ReadClientDto>>> GetClients()
     {
-        return await _clientsService.GetAllAsync();
+        var clients = await _clientsService.GetAllAsync();
+        return Ok(clients);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetDetails(int id)
+    public async Task<ActionResult<ReadClientDto>> GetDetails(int id)
     {
         var client = await _clientsService.GetByIdAsync(id);
         if (client == null) return NotFound();
@@ -26,7 +27,7 @@ public class ClientsController(IClientsService _clientsService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(CreateClientDto createDto)
+    public async Task<ActionResult<ReadClientDto>> Post(CreateClientDto createDto)
     {
         if (createDto == null) return BadRequest();
 
